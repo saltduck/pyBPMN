@@ -5,6 +5,7 @@ Created on 2011-9-21
 '''
 
 import logging
+import warnings
 from threading import Thread
 
 from bpmn.common.flowobjects import FlowObjects
@@ -37,6 +38,7 @@ class Process(Thread):
             try:
                 tagclass = KNOWNTAGS[tagname]
             except KeyError:
+                warnings.warn('{0} is not implemented'.format(tagname))
                 continue
             element = tagclass(subtag)
             if isinstance(element, FlowObjects):

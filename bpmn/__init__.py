@@ -3,6 +3,9 @@ try:
 except ImportError:
     from xml.etree import ElementTree
 
+class XMLFormatError(RuntimeError):
+    pass
+
 from bpmn.process import Process
 
 def load_definition(xmlstr):
