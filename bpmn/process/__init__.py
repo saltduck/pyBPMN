@@ -5,10 +5,7 @@ Created on 2011-9-21
 '''
 
 import logging
-try:
-    import cElementTree as ElementTree
-except ImportError:
-    from xml.etree import ElementTree
+from threading import Thread
 
 from bpmn.common.flowobjects import FlowObjects
 from bpmn.event.startEvent import StartEvent
@@ -25,18 +22,10 @@ KNOWNTAGS = {
         }
         
 
-class ProcessDef(object):
-    """ Process Definition Class """
-    def __init__(self, xmlstr):
-        self.root = ElementTree.fromstring(xmlstr)
-
-    def new(self):
-        return Process(self.root.getchildren()[0])
-        
-
-class Process(object):
+class Process(Thread):
     """ Process Class """
     def __init__(self, root):
+        super(Process, self).__init__()
         self.id = root.attrib["id"]
         self.name = root.attrib["name"]
         self.processType = root.get("processType", "private")
@@ -78,7 +67,7 @@ class Process(object):
                 result.append(element)
         return result
     
-    def start(self):
+    def run(self):
         self.is_running = True
         while self.tokens:
             for i in range(len(self.tokens)):
