@@ -5,5 +5,5 @@ Created on 2011-9-21
 '''
 class BaseElement(object):
     def __init__(self,tag):
-        self.id = tag.attrib["id"]
-        self.name = tag.attrib["name"]
+        self.id = tag.attrib.get("id", "")
+        self.name = tag.attrib.get("name", "")

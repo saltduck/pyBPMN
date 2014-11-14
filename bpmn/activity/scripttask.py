@@ -9,7 +9,7 @@ class ScriptTask(Task):
     def __init__(self, tag):
         super(ScriptTask,self).__init__(tag)
         self.scriptFormat = tag.attrib["scriptFormat"]
-        script_tag = tag.find("{http://www.omg.org/spec/BPMN/20100524/MODEL}script")
+        script_tag = tag.find("script")
         self.script = script_tag.text
         if self.scriptFormat <> self.SCRIPTFORMAT:
             raise NotImplementedError(_("ScriptTask support only application/x-pybpmn language."))

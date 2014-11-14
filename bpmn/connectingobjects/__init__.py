@@ -3,7 +3,7 @@ Created on 2011-9-21
 
 @author: hsn
 '''
-from common.baseelement import BaseElement
+from bpmn.common.baseelement import BaseElement
 
 
 class ConnectingObjects(BaseElement):

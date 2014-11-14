@@ -1,4 +1,4 @@
-from activity import Activity
+from . import Activity
 
 
 class Task(Activity):

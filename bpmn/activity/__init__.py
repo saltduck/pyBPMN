@@ -1,4 +1,4 @@
-from common.flowobjects import FlowObjects
+from bpmn.common.flowobjects import FlowObjects
 
 
 class Activity(FlowObjects):

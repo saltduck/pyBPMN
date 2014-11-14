@@ -10,11 +10,11 @@ try:
 except ImportError:
     from xml.etree import ElementTree
 
-from common.flowobjects import FlowObjects
-from event.startEvent import StartEvent
-from event.endEvent import EndEvent
-from activity.scripttask import ScriptTask
-from connectingobjects.sequenceflow import SequenceFlow
+from bpmn.common.flowobjects import FlowObjects
+from bpmn.event.startEvent import StartEvent
+from bpmn.event.endEvent import EndEvent
+from bpmn.activity.scripttask import ScriptTask
+from bpmn.connectingobjects.sequenceflow import SequenceFlow
 
  
 KNOWNTAGS = {
@@ -24,11 +24,19 @@ KNOWNTAGS = {
             'sequenceFlow'  : SequenceFlow
         }
         
+
+class ProcessDef(object):
+    """ Process Definition Class """
+    def __init__(self, xmlstr):
+        self.root = ElementTree.fromstring(xmlstr)
+
+    def new(self):
+        return Process(self.root.getchildren()[0])
         
+
 class Process(object):
     """ Process Class """
-    def __init__(self, xmlstr):
-        root = ElementTree.fromstring(xmlstr)
+    def __init__(self, root):
         self.id = root.attrib["id"]
         self.name = root.attrib["name"]
         self.processType = root.get("processType", "private")
@@ -36,9 +44,10 @@ class Process(object):
         self.isExcecutable = root.get("isExecutable", True)
         self.objects = {}
         for subtag in root.getchildren():
-            tagname = subtag.tag[45:]   # remove namespace
-            tagclass = KNOWNTAGS.get(tagname, None)
-            if tagclass is None:
+            tagname = subtag.tag
+            try:
+                tagclass = KNOWNTAGS[tagname]
+            except KeyError:
                 continue
             element = tagclass(subtag)
             if isinstance(element, FlowObjects):
