@@ -7,12 +7,12 @@ def test_1():
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
     <bpmn:process id="p1" name="process1">
         <startEvent id="1" name="START"></startEvent>
+        <sequenceFlow sourceRef="1" targetRef="2"></sequenceFlow>
         <scriptTask id="2" scriptFormat="application/x-pybpmn">
             <script>print "Hello, World"</script>
         </scriptTask>
-        <sequenceFlow sourceRef="1" targetRef="2"></sequenceFlow>
-        <endEvent id="3"></endEvent>
         <sequenceFlow sourceRef="2" targetRef="3"></sequenceFlow>
+        <endEvent id="3"></endEvent>
     </bpmn:process>
 </bpmn:definitions>""")
     proc1 = pd.new()

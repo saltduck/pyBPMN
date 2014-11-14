@@ -53,8 +53,10 @@ class Process(object):
             if isinstance(element, FlowObjects):
                 self.objects[element.id] = element
             if isinstance(element, SequenceFlow):
-                self.objects[element.source_id].next_flowobject = \
-                        self.objects[element.target_id]
+                self.objects[element.source_id].next_flowobject_id = element.target_id
+        for element in self.objects.values():
+            if hasattr(element, 'next_flowobject_id'):
+                element.next_flowobject = self.objects[element.next_flowobject_id]
         self.result = None
         self.tokens = self.get_all_startEvent()
         self.is_running = False
