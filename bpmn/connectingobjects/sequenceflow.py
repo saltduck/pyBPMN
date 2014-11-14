@@ -3,7 +3,7 @@ Created on 2011-9-21
 
 @author: hsn
 '''
-from connectingobjects import ConnectingObjects
+from . import ConnectingObjects
 
 class SequenceFlow(ConnectingObjects):
     def __init__(self, tag):
