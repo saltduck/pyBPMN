@@ -1,3 +1,8 @@
+'''
+Created on 2011-9-21
+
+@author: hsn
+'''
 try:
     import cElementTree as ElementTree
 except ImportError:

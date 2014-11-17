@@ -3,9 +3,9 @@ Created on 2011-9-21
 
 @author: hsn
 '''
-from catchEvent import CatchEvent
+from . import ThrowEvent
 
 
-class EndEvent(CatchEvent):
+class EndEvent(ThrowEvent):
     def __init__(self, tag):
         super(EndEvent,self).__init__(tag)

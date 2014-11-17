@@ -3,7 +3,7 @@ Created on 2011-9-21
 
 @author: hsn
 '''
-from catchEvent import CatchEvent
+from . import CatchEvent
 
 
 class StartEvent(CatchEvent):

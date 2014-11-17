@@ -8,11 +8,11 @@ import logging
 import warnings
 from threading import Thread
 
-from bpmn.common.flowobjects import FlowObjects
+from bpmn.common import FlowElementsContainer, CallableElement
+from bpmn.common import SequenceFlow, FlowNode
 from bpmn.event.startEvent import StartEvent
 from bpmn.event.endEvent import EndEvent
 from bpmn.activity.scripttask import ScriptTask
-from bpmn.connectingobjects.sequenceflow import SequenceFlow
 
  
 KNOWNTAGS = {
@@ -23,13 +23,15 @@ KNOWNTAGS = {
         }
         
 
-class Process(Thread):
+class GlobalTask(CallableElement):
+    pass
+
+
+class Process(FlowElementsContainer, CallableElement, Thread):
     """ Process Class """
     def __init__(self, root):
-        super(Process, self).__init__()
-        self.id = root.attrib["id"]
-        self.name = root.attrib["name"]
-        self.processType = root.get("processType", "private")
+        super(Process, self).__init__(root)
+        self.processType = root.get("processType", "none")
         self.isClosed = root.get("isClosed", False)
         self.isExcecutable = root.get("isExecutable", True)
         self.objects = {}
@@ -41,13 +43,12 @@ class Process(Thread):
                 warnings.warn('{0} is not implemented'.format(tagname))
                 continue
             element = tagclass(subtag)
-            if isinstance(element, FlowObjects):
+            self.append(element)
+            if hasattr(element, "id"):
                 self.objects[element.id] = element
-            if isinstance(element, SequenceFlow):
-                self.objects[element.source_id].next_flowobject_id = element.target_id
         for element in self.objects.values():
-            if hasattr(element, 'next_flowobject_id'):
-                element.next_flowobject = self.objects[element.next_flowobject_id]
+            if hasattr(element, 'process_refs'):
+                element.process_refs(self.objects)
         self.result = None
         self.tokens = self.get_all_startEvent()
         self.is_running = False

@@ -1,7 +1,7 @@
-from bpmn.common.flowobjects import FlowObjects
+from bpmn.common import FlowNode
 
 
-class Activity(FlowObjects):
+class Activity(FlowNode):
     def __init__(self, tag):
         super(Activity,self).__init__(tag)
         self.isForCompensation = tag.attrib.get("isForCompensation", False)
