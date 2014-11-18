@@ -24,10 +24,10 @@ def test_1():
     eq_(len(processes), 2)
     proc1, proc2 = processes
     eq_(len(proc1.objects), 5, str(proc1.objects))
-    eq_(len(proc1.tokens), 1)
     proc1.start()
     proc2.start()
+    eq_(len(proc1.instances), 1)
     proc1.join()
     proc2.join()
-    assert not proc1.tokens
-    assert not proc2.tokens
+    assert not proc1.instances
+    assert not proc2.instances

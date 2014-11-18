@@ -7,3 +7,4 @@ class Activity(FlowNode):
         self.isForCompensation = tag.attrib.get("isForCompensation", False)
         self.startQuantity = tag.attrib.get("startQuantity", 1)
         self.completionQuantity = tag.attrib.get("completionQuantity", 1)
+        self.state = "none"

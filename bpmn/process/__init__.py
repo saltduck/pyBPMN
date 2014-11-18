@@ -5,6 +5,7 @@ Created on 2011-9-21
 '''
 
 import logging
+import copy
 import warnings
 from threading import Thread
 
@@ -27,13 +28,13 @@ class GlobalTask(CallableElement):
     pass
 
 
-class Process(FlowElementsContainer, CallableElement, Thread):
+class Process(FlowElementsContainer, CallableElement):
     """ Process Class """
     def __init__(self, root):
         super(Process, self).__init__(root)
         self.processType = root.get("processType", "none")
         self.isClosed = root.get("isClosed", False)
-        self.isExcecutable = root.get("isExecutable", True)
+        self.isExecutable = root.get("isExecutable", True)
         self.objects = {}
         for subtag in root.getchildren():
             tagname = subtag.tag
@@ -49,19 +50,33 @@ class Process(FlowElementsContainer, CallableElement, Thread):
         for element in self.objects.values():
             if hasattr(element, 'process_refs'):
                 element.process_refs(self.objects)
-        self.result = None
-        self.tokens = self.get_all_startEvent()
-        self.is_running = False
-        self.is_finished = False
-    
-    @property
-    def token(self):
-        if len(self.tokens) == 1:
-            return self.tokens[0]
-        raise AttributeError, "Process instance has no attribute 'token'"
+        self.instances = []
         
     def element_count(self):
         return len(self.objects)
+    
+    def start(self):
+        assert self.isExecutable
+        instance = ProcessInst(self)
+        self.instances.append(instance)
+        instance.start()
+
+    def join(self):
+        for instance in self.instances:
+            instance.join()
+            self.instances.remove(instance)
+
+
+class ProcessInst(Thread):
+    """ Runtime Process Instance """
+    def __init__(self, process):
+        super(ProcessInst, self).__init__()
+        self.objects = copy.deepcopy(process.objects)
+        self.state = "none"
+        self.tokens = self.get_all_startEvent()
+        self.result = None
+        self.is_running = False
+        self.is_finished = False
     
     def get_all_startEvent(self):
         result = []
@@ -69,6 +84,12 @@ class Process(FlowElementsContainer, CallableElement, Thread):
             if isinstance(element, StartEvent):
                 result.append(element)
         return result
+
+    @property
+    def token(self):
+        if len(self.tokens) == 1:
+            return self.tokens[0]
+        raise AttributeError, "Process instance has no attribute 'token'"
     
     def run(self):
         self.is_running = True
