@@ -56,7 +56,7 @@ class Process(FlowElementsContainer, CallableElement):
     def element_count(self):
         return len(self.objects)
     
-    def start(self):
+    def instantiate(self):
         assert self.isExecutable
         instance = ProcessInst(self)
         self.instances.append(instance)
@@ -72,22 +72,11 @@ class ProcessInst(Thread):
     """ Runtime Process Instance """
     def __init__(self, process):
         super(ProcessInst, self).__init__()
-        self.objects = copy.deepcopy(process.objects)
+        self.process = process
         self.state = "none"
-        self.tokens = [e for e in self.objects.values() if e.auto_instantiate]
-        self.result = None
+        self.tokens = [e for e in process.objects.values() if e.auto_instantiate]
         self.is_running = False
         self.is_finished = False
-    
-    def get_initial_tokens(self):
-        tokens = []
-        for element in self.objects.values():
-            if isinstance(element, StartEvent):
-                tokens.append(element)
-            elif isinstance(element, Activity):
-                if not element.incoming:
-                    tokens.append(element)
-        return tokens
 
     @property
     def token(self):
@@ -99,6 +88,7 @@ class ProcessInst(Thread):
         self.is_running = True
         while self.tokens:
             for i in range(len(self.tokens)):
+                self.tokens[i].instantiate()
                 self.tokens[i].wait_for_complete()
                 self.tokens[i] = self.tokens[i].get_next()
             # remove ended tokens

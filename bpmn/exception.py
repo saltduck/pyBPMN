@@ -1,0 +1,3 @@
+
+class XMLFormatError(RuntimeError):
+    pass

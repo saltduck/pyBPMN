@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__file__)
+from . import engine
 from .foundation import BaseElement, RootElement
 
 def make_bool(boolstr):
@@ -13,6 +16,10 @@ class FlowElement(BaseElement):
     def __init__(self, tag):
         super(FlowElement, self).__init__(tag)
         self.name = tag.attrib.get("name", "")
+        engine.db[self.id] = self
+
+    def instantiate(self):
+        pass
 
 
 class SequenceFlow(FlowElement):
@@ -38,7 +45,7 @@ class FlowNode(FlowElement):
         self.outgoing = []
            
     def wait_for_complete(self):
-        print "%s<id=%s> is running...".format(
+        print "{0}<id={1}> is running...".format(
             self.__class__, self.id
             )
     

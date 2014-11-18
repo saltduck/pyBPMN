@@ -12,3 +12,6 @@ class StartEvent(CatchEvent):
     def __init__(self, tag):
         super(StartEvent,self).__init__(tag)
         self.isInterrupting = tag.attrib.get("isInterrupting", False)
+
+    def trigger(self):
+        self.container.instantiate()

@@ -4,6 +4,9 @@ class Event(FlowNode):
     def __init__(self, tag):
         super(Event,self).__init__(tag)
 
+    def trigger(self):
+        raise NotImplementedError
+
 
 class ThrowEvent(Event):
     def __init__(self, tag):

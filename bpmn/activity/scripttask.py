@@ -18,6 +18,7 @@ class ScriptTask(Task):
                 raise XMLFormatError(_("ScriptTask support only application/x-pybpmn language."))
         
     def wait_for_complete(self):
+        super(ScriptTask, self).wait_for_complete()
         if not self.script:
             return
         if self.scriptFormat == self.SCRIPTFORMAT:
