@@ -87,16 +87,12 @@ class ProcessInst(Thread):
     def run(self):
         self.is_running = True
         while self.tokens:
-            for elem in self.tokens:
-                elem.instantiate()
-                elem.wait_for_complete()
-            # get next tokens
-            next_tokens = set()
-            for elem in self.tokens:
-                token = elem.get_next()
-                if token:
-                    next_tokens.update(token)
-            self.tokens = next_tokens
+            immutable_tokens = list(self.tokens)
+            for elem in immutable_tokens:
+                inst = elem.instantiate()
+                inst.wait_for_complete()
+                self.tokens.discard(elem)
+                self.tokens.update(inst.get_next()) 
         # process instance has completed
         self.is_running = False
         self.is_finished = True

@@ -7,7 +7,6 @@ class Activity(FlowNode):
         self.isForCompensation = tag.attrib.get("isForCompensation", False)
         self.startQuantity = tag.attrib.get("startQuantity", 1)
         self.completionQuantity = tag.attrib.get("completionQuantity", 1)
-        self.state = "none"
 
     @property
     def auto_instantiate(self):
@@ -17,6 +16,20 @@ class Activity(FlowNode):
         """
         return len(self.incoming) == 0
 
+    def instantiate(self):
+        return ActivityInst(self)
+
+
+class ActivityInst(object):
+    def __init__(self, activity):
+        self.activity = activity
+        self.state = "ready"
+
+    def wait_for_complete(self, *args, **kwargs):
+        return self.activity.wait_for_complete(*args, **kwargs)
+
+    def get_next(self, *args, **kwargs):
+        return self.activity.get_next(*args, **kwargs)
 
 class CompensationActivity(Activity):
     auto_instantiate = False

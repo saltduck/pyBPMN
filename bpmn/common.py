@@ -19,7 +19,7 @@ class FlowElement(BaseElement):
         engine.db[self.id] = self
 
     def instantiate(self):
-        pass
+        return self
 
 
 class SequenceFlow(FlowElement):
@@ -50,8 +50,6 @@ class FlowNode(FlowElement):
             )
     
     def get_next(self):
-        if not self.outgoing:
-            return None
         return [outgoing.targetRef for outgoing in self.outgoing]
     
 
