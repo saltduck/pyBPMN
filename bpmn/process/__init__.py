@@ -74,7 +74,7 @@ class ProcessInst(Thread):
         super(ProcessInst, self).__init__()
         self.process = process
         self.state = "none"
-        self.tokens = [e for e in process.objects.values() if e.auto_instantiate]
+        self.tokens = set([e for e in process.objects.values() if e.auto_instantiate])
         self.is_running = False
         self.is_finished = False
 
@@ -87,12 +87,17 @@ class ProcessInst(Thread):
     def run(self):
         self.is_running = True
         while self.tokens:
-            for i in range(len(self.tokens)):
-                self.tokens[i].instantiate()
-                self.tokens[i].wait_for_complete()
-                self.tokens[i] = self.tokens[i].get_next()
-            # remove ended tokens
-            self.tokens = filter(lambda e:not isinstance(e, EndEvent), self.tokens)
+            for elem in self.tokens:
+                elem.instantiate()
+                elem.wait_for_complete()
+            # get next tokens
+            next_tokens = set()
+            for elem in self.tokens:
+                token = elem.get_next()
+                if token:
+                    next_tokens.update(token)
+            self.tokens = next_tokens
+        # process instance has completed
         self.is_running = False
         self.is_finished = True
         

@@ -50,8 +50,9 @@ class FlowNode(FlowElement):
             )
     
     def get_next(self):
-        # TODO
-        return self.outgoing[0].targetRef
+        if not self.outgoing:
+            return None
+        return [outgoing.targetRef for outgoing in self.outgoing]
     
 
 class Expression(SequenceFlow):
