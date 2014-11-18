@@ -8,3 +8,19 @@ class Activity(FlowNode):
         self.startQuantity = tag.attrib.get("startQuantity", 1)
         self.completionQuantity = tag.attrib.get("completionQuantity", 1)
         self.state = "none"
+
+    @property
+    def auto_instantiate(self):
+        """ If the Activity does not have an incoming Sequence Flow,
+        then the Activity MUST be instantiated when the Process is instantiated.
+        There are two exceptions to this: Compensation Activities and Event Sub-Processes.
+        """
+        return len(self.incoming) == 0
+
+
+class CompensationActivity(Activity):
+    auto_instantiate = False
+
+
+class EventSubProcesse(Activity):
+    auto_instantiate = False

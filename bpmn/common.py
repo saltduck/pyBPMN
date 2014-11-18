@@ -8,6 +8,8 @@ def make_bool(boolstr):
 
 
 class FlowElement(BaseElement):
+    auto_instantiate = False
+
     def __init__(self, tag):
         super(FlowElement, self).__init__(tag)
         self.name = tag.attrib.get("name", "")

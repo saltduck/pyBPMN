@@ -13,6 +13,7 @@ from bpmn.common import FlowElementsContainer, CallableElement
 from bpmn.common import SequenceFlow, FlowNode
 from bpmn.event.startEvent import StartEvent
 from bpmn.event.endEvent import EndEvent
+from bpmn.activity import Activity
 from bpmn.activity.scripttask import ScriptTask
 
  
@@ -73,17 +74,20 @@ class ProcessInst(Thread):
         super(ProcessInst, self).__init__()
         self.objects = copy.deepcopy(process.objects)
         self.state = "none"
-        self.tokens = self.get_all_startEvent()
+        self.tokens = [e for e in self.objects.values() if e.auto_instantiate]
         self.result = None
         self.is_running = False
         self.is_finished = False
     
-    def get_all_startEvent(self):
-        result = []
+    def get_initial_tokens(self):
+        tokens = []
         for element in self.objects.values():
             if isinstance(element, StartEvent):
-                result.append(element)
-        return result
+                tokens.append(element)
+            elif isinstance(element, Activity):
+                if not element.incoming:
+                    tokens.append(element)
+        return tokens
 
     @property
     def token(self):

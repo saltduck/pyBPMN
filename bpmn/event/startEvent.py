@@ -7,6 +7,8 @@ from . import CatchEvent
 
 
 class StartEvent(CatchEvent):
+    auto_instantiate = True
+
     def __init__(self, tag):
         super(StartEvent,self).__init__(tag)
         self.isInterrupting = tag.attrib.get("isInterrupting", False)
