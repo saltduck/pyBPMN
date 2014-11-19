@@ -1,14 +1,18 @@
+import uuid
+
+from bpmn import engine
 
 
-class RootElement(object):
+class BaseElement(object):
     def __init__(self, tag):
-        super(RootElement, self).__init__()
+        super(BaseElement, self).__init__()
+        self.id = tag.attrib.get("id", uuid.uuid1().hex)
+        engine.db[self.id] = self
 
 
-class BaseElement(RootElement):
+class RootElement(BaseElement):
     def __init__(self, tag):
-        super(BaseElement, self).__init__(tag)
-        self.id = tag.attrib["id"]
+        super(RootElement, self).__init__(tag)
 
 
 class Documentation(BaseElement):

@@ -1,3 +1,4 @@
+import warnings
 try:
     import cElementTree as ElementTree
 except ImportError:
@@ -7,8 +8,14 @@ except ImportError:
 class DataStore(object):
     data = {}
     
+    def __getitem__(self, k):
+        return self.data[k]
+
     def __setitem__(self, k ,v):
         self.data[k] = v
+
+    def count(self):
+        return len(self.data)
 
     def get_event(self, eid):
         from .event import Event
@@ -20,13 +27,23 @@ db = DataStore()
 
 processes = {}
 
-def load_definition(xmlstr):
+def _analyze_tree(root):
     from .process import Process
-    root = ElementTree.fromstring(xmlstr)
+    from .common import Resource
     for tag in root.getchildren():
-        process = Process(tag)
-        processes[process.id] = process
+        if tag.tag == 'process':
+            process = Process(tag)
+            processes[process.id] = process
+        elif tag.tag == 'resource':
+            Resource(tag)
+        else:
+            warnings.warn('{0} is unknown'.format(tag.tag))
 
-def trigger(eventid):
-    db.get_event(eventid).trigger()
+def load_definition(xmlstr):
+    root = ElementTree.fromstring(xmlstr)
+    _analyze_tree(root)
 
+def load_definition_file(xmlfile):
+    tree = ElementTree.parse(xmlfile)
+    root = tree.getroot()
+    _analyze_tree(root)

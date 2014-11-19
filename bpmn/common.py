@@ -16,7 +16,6 @@ class FlowElement(BaseElement):
     def __init__(self, tag):
         super(FlowElement, self).__init__(tag)
         self.name = tag.attrib.get("name", "")
-        engine.db[self.id] = self
 
     def instantiate(self):
         return self
@@ -82,6 +81,10 @@ class Resource(RootElement):
     def __init__(self, tag):
         super(Resource, self).__init__(tag)
         self.name = tag.attrib["name"]
+        self.resourceParameters = []
+        for subtag in tag.getchildren():
+            if subtag.tag == 'resourceParameter':
+                self.resourceParameters.append(ResourceParameter(subtag))
 
 
 class ResourceParameter(BaseElement):

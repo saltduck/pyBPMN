@@ -10,25 +10,9 @@ import warnings
 from threading import Thread
 
 from bpmn.common import FlowElementsContainer, CallableElement
-from bpmn.common import SequenceFlow, FlowNode
-from bpmn.event.startEvent import StartEvent
-from bpmn.event.endEvent import EndEvent
-from bpmn.activity import Activity
-from bpmn.activity.scripttask import ScriptTask
+from bpmn import models
 
  
-KNOWNTAGS = {
-            'startEvent'    : StartEvent,
-            'endEvent'      : EndEvent,
-            'scriptTask'    : ScriptTask,
-            'sequenceFlow'  : SequenceFlow
-        }
-        
-
-class GlobalTask(CallableElement):
-    pass
-
-
 class Process(FlowElementsContainer, CallableElement):
     """ Process Class """
     def __init__(self, root):
@@ -38,10 +22,10 @@ class Process(FlowElementsContainer, CallableElement):
         self.isExecutable = root.get("isExecutable", True)
         self.objects = {}
         for subtag in root.getchildren():
-            tagname = subtag.tag
+            tagname = subtag.tag[0].upper() + subtag.tag[1:]
             try:
-                tagclass = KNOWNTAGS[tagname]
-            except KeyError:
+                tagclass = getattr(models, tagname)
+            except AttributeError:
                 warnings.warn('{0} is not implemented'.format(tagname))
                 continue
             element = tagclass(subtag)
@@ -61,6 +45,7 @@ class Process(FlowElementsContainer, CallableElement):
         instance = ProcessInst(self)
         self.instances.append(instance)
         instance.start()
+        return instance
 
     def join(self):
         for instance in self.instances:
