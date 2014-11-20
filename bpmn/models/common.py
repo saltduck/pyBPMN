@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__file__)
 from bpmn import engine
 from bpmn.core import XMLTagText, StringAttribute, BooleanAttribute, SingleAssociation, MultiAssociation
-from .foundation import BaseElement, RootElement
+from .foundation import BaseElement, RootElement, ReferenceElement
 
 
 class FlowElement(BaseElement):
@@ -79,7 +79,11 @@ class ResourceParameter(BaseElement):
 class Resource(RootElement):
     name = StringAttribute('name', required=True)
     resourceParameters = MultiAssociation(ResourceParameter)
-        
+
+
+class ResourceRef(ReferenceElement):
+    pass
+
 
 class CallableElement(RootElement):
     name = StringAttribute('name', required=True)

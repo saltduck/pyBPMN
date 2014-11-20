@@ -1,4 +1,5 @@
 import warnings
+
 from .core import MetaRegister
 
 def analyze_node(node):

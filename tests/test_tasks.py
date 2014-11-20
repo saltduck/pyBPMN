@@ -2,6 +2,7 @@ from nose.tools import eq_
 
 from bpmn import engine
 from bpmn.models.common import FormalExpression
+from bpmn.models.activities import ResourceParameterBinding
 from bpmn.models.humaninteraction import PotentialOwner
 
 def test_usertask():
@@ -14,11 +15,11 @@ def test_usertask():
 </resource>
 <userTask id="ApproveOrder" name="ApproveOrder">
 <potentialOwner>
-<resourceRef>tns:regionalManager</resourceRef>
-<resourceParameterBinding parameterRef="tns:buyerName">
+<resourceRef>regionalManager</resourceRef>
+<resourceParameterBinding parameterRef="buyerName">
 <formalExpression>getDataInput('order')/address/name</formalExpression>
 </resourceParameterBinding>
-<resourceParameterBinding parameterRef="tns:region">
+<resourceParameterBinding parameterRef="region">
 <formalExpression>getDataInput('order')/address/country</formalExpression>
 </resourceParameterBinding>
 </potentialOwner>
@@ -26,21 +27,26 @@ def test_usertask():
 </definitions>
     """
     engine.load_definition(xmlstr)
-    print engine.db.data
     eq_(engine.db.count(), 10)
     usertask = engine.db['ApproveOrder']
     eq_(usertask.name, 'ApproveOrder')
     eq_(len(usertask.resources), 1)
     po = usertask.resources[0]
     assert isinstance(po, PotentialOwner)
-    eq_(po.resourceRef.name, 'tns:regionalManager')
+    eq_(po.resourceRef.refid, 'regionalManager')
+    eq_(po.resource.name, 'Regional Manager')
     eq_(len(po.resourceParameterBindings), 2)
+    po.resourceParameterBindings.sort()
     para1, para2 = po.resourceParameterBindings
-    eq_(para1.name, 'tns:buyerName')
-    eq_(para2.name, 'tns:region')
-    assert isinstance(para1, FormalExpression)
-    assert isinstance(para2, FormalExpression)
-    eq_(para1.expresssion.body, "getDataInput('order')/address/name")
-    eq_(para2.expresssion.body, "getDataInput('order')/address/country")
+    assert isinstance(para1, ResourceParameterBinding)
+    assert isinstance(para2, ResourceParameterBinding)
+    eq_(para1.parameterRef, 'buyerName')
+    eq_(para1.parameter.name, 'Buyer Name')
+    eq_(para2.parameterRef, 'region')
+    eq_(para2.parameter.name, 'Region')
+    assert isinstance(para1.expression, FormalExpression)
+    assert isinstance(para2.expression, FormalExpression)
+    eq_(para1.expression.body, "getDataInput('order')/address/name")
+    eq_(para2.expression.body, "getDataInput('order')/address/country")
 
     

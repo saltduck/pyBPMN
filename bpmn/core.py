@@ -1,3 +1,6 @@
+from .exceptions import XMLFormatError
+
+
 class BaseAttribute(object):
     def __init__(self, xmlattr, default=None, required=False):
         self.xmlattr = xmlattr
@@ -54,11 +57,11 @@ class SingleAssociation(MultiAssociation):
         if len(values) > 1:
             raise XMLFormatError('There should be only 1 association to {0} in {1}(id={2})'.format(attribute, self.tagname, self.id))
         if len(values) == 0:
-            values = None
+            value = None
         else:   # len(values) == 1
-            values = values[0]
-        return values
-
+            value = values[0]
+        return value
+    
 
 class XMLTagText(BaseAttribute):
     def __init__(self):

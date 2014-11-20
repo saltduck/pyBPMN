@@ -1,5 +1,6 @@
 from gettext import gettext as _
 
+from .. import engine
 from bpmn.exceptions import XMLFormatError
 from bpmn.core import StringAttribute, BooleanAttribute, IntAttribute, SingleAssociation, MultiAssociation
 from .foundation import BaseElement
@@ -10,6 +11,7 @@ class Activity(FlowNode):
     isForCompensation = BooleanAttribute('isForCompensation', default=False)
     startQuantity = IntAttribute('startQuantity', default=1)
     completionQuantity = IntAttribute('completionQuantity', default=1)
+    resources = MultiAssociation('ResourceRole')
 
     @property
     def auto_instantiate(self):
@@ -77,13 +79,17 @@ class ResourceAssignmentExpression(BaseElement):
 
 
 class ResourceParameterBinding(BaseElement):
-    parameterRef = SingleAssociation(ResourceParameter, required=True)
+    parameterRef = StringAttribute('parameterRef', required=True)
     expression = SingleAssociation(Expression, required=True)
+
+    @property
+    def parameter(self):
+        return engine.db[self.parameterRef]
 
 
 class ResourceRole(BaseElement):
     name = StringAttribute('name')
-    resourceRef = SingleAssociation(Resource)
+    resourceRef = SingleAssociation('ResourceRef')
     resourceAssignmentExpression = SingleAssociation(ResourceAssignmentExpression)
     resourceParameterBindings = MultiAssociation(ResourceParameterBinding)
 
@@ -92,3 +98,7 @@ class ResourceRole(BaseElement):
             raise XMLFormatError('resourceRef and resourceAssignmentExpression should not exists together.')
         if self.resourceParameterBindings and not self.resourceRef:
             raise XMLFormatError('resourceParameterBindings is only applicable if a resourceRef is specified.')
+
+    @property
+    def resource(self):
+        return engine.db[self.resourceRef.refid]

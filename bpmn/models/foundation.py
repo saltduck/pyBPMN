@@ -5,7 +5,7 @@ import warnings
 
 from bpmn import engine
 from bpmn.exceptions import XMLFormatError
-from bpmn.core import MetaRegister, StringAttribute, MultiAssociation
+from bpmn.core import MetaRegister, StringAttribute, MultiAssociation, XMLTagText
 from bpmn.utils import analyze_node
 
 
@@ -38,6 +38,10 @@ class BaseElement(object):
 
 class RootElement(BaseElement):
     pass
+        
+
+class ReferenceElement(BaseElement):
+    refid = XMLTagText()
 
 
 class Documentation(BaseElement):
