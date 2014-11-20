@@ -9,8 +9,7 @@ import copy
 import warnings
 from threading import Thread
 
-from bpmn.common import FlowElementsContainer, CallableElement
-from bpmn import models
+from .common import FlowElementsContainer, CallableElement
 
  
 class Process(FlowElementsContainer, CallableElement):

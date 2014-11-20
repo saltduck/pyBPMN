@@ -1,4 +1,5 @@
-from bpmn.common import FlowNode
+from .common import FlowNode
+
 
 class Event(FlowNode):
     def __init__(self, tag):
@@ -19,3 +20,19 @@ class CatchEvent(Event):
         super(CatchEvent,self).__init__(tag)
         self.parallelMultiple = tag.get("parallelMultiple", False)
         self.outputSet = tag.get("outputSet", None)
+
+
+class StartEvent(CatchEvent):
+    auto_instantiate = True
+
+    def __init__(self, tag):
+        super(StartEvent,self).__init__(tag)
+        self.isInterrupting = tag.attrib.get("isInterrupting", False)
+
+    def trigger(self):
+        self.container.instantiate()
+
+
+class EndEvent(ThrowEvent):
+    def __init__(self, tag):
+        super(EndEvent,self).__init__(tag)

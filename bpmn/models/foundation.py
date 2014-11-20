@@ -2,16 +2,8 @@ import uuid
 import warnings
 
 from bpmn import engine
-from bpmn.exception import XMLFormatError
-
-
-class MetaRegister(type):
-    registry = {}
-
-    def __new__(cls, name, bases, attrs):
-        new_cls = super(MetaRegister, cls).__new__(cls, name, bases, attrs)
-        cls.registry[name] = new_cls
-        return new_cls
+from bpmn.exceptions import XMLFormatError
+from bpmn.utils import MetaRegister, analyze_node
 
 
 class BaseElement(object):
@@ -24,13 +16,9 @@ class BaseElement(object):
         engine.db[self.id] = self
         self.children = {}
         for subtag in tag.getchildren():
-            tagname = subtag.tag[0].upper() + subtag.tag[1:]
-            try:
-                tagclass = BaseElement.registry[tagname]
-            except KeyError:
-                warnings.warn('{0} is not implemented'.format(tagname))
+            element = analyze_node(subtag)
+            if element is None:
                 continue
-            element = tagclass(subtag)
             if self.children.has_key(element.id):
                 raise XMLFormatError('Duplicate ID!')
             self.children[element.id] = element

@@ -1,9 +1,11 @@
 import warnings
+from nose.tools import eq_
 try:
     import cElementTree as ElementTree
 except ImportError:
     from xml.etree import ElementTree
 
+from .utils import analyze_node
 
 class DataStore(object):
     data = {}
@@ -21,7 +23,7 @@ class DataStore(object):
         self.data = {}
 
     def get_event(self, eid):
-        from .event import Event
+        from .models.event import Event
         for elem in self.data.values():
             if elem.id == eid and isinstance(elem, Event):
                 return elem
@@ -31,16 +33,13 @@ db = DataStore()
 processes = {}
 
 def _analyze_tree(root):
-    from .process import Process
-    from .common import Resource
+    eq_(root.tag, 'definitions')
     for tag in root.getchildren():
+        element = analyze_node(tag)
+        if element is None:
+            continue
         if tag.tag == 'process':
-            process = Process(tag)
-            processes[process.id] = process
-        elif tag.tag == 'resource':
-            Resource(tag)
-        else:
-            warnings.warn('{0} is unknown'.format(tag.tag))
+            processes[element.id] = element
 
 def load_definition(xmlstr):
     root = ElementTree.fromstring(xmlstr)

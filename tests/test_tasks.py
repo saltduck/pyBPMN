@@ -1,8 +1,8 @@
 from nose.tools import eq_
 
 from bpmn import engine
-from bpmn.common import FormalExpression
-from bpmn.humaninteraction import PotentialOwner
+from bpmn.models.common import FormalExpression
+from bpmn.models.humaninteraction import PotentialOwner
 
 def test_usertask():
     engine.db.clear()
@@ -26,6 +26,7 @@ def test_usertask():
 </definitions>
     """
     engine.load_definition(xmlstr)
+    print engine.db.data
     eq_(engine.db.count(), 7)
     usertask = engine.db['ApproveOrder']
     eq_(usertask.name, 'ApproveOrder')

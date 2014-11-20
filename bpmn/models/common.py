@@ -1,6 +1,6 @@
 import logging
 logger = logging.getLogger(__file__)
-from . import engine
+from bpmn import engine
 from .foundation import BaseElement, RootElement
 
 def make_bool(boolstr):

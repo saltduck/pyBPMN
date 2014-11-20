@@ -1,4 +1,4 @@
-from bpmn.common import FlowNode
+from .common import FlowNode
 
 class Gateway(FlowNode):
     def __init__(self, tag):

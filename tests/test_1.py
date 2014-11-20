@@ -7,7 +7,7 @@ from bpmn import engine
 def test_1():
     engine.db.clear()
     engine.load_definition("""
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
+<definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
     <process id="p1" name="process1">
         <startEvent id="event_1" name="START"></startEvent>
         <sequenceFlow id="sf1" sourceRef="event_1" targetRef="2"></sequenceFlow>
@@ -20,7 +20,7 @@ def test_1():
         <sequenceFlow id="sf2" sourceRef="2" targetRef="event_3"></sequenceFlow>
         <endEvent id="event_3"></endEvent>
     </process>
-</bpmn:definitions>""")
+</definitions>""")
     eq_(len(engine.processes), 2)
     proc1 = engine.processes['p1']
     proc2 = engine.processes['p2']
