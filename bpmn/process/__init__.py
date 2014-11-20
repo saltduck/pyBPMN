@@ -20,21 +20,9 @@ class Process(FlowElementsContainer, CallableElement):
         self.processType = root.get("processType", "none")
         self.isClosed = root.get("isClosed", False)
         self.isExecutable = root.get("isExecutable", True)
-        self.objects = {}
-        for subtag in root.getchildren():
-            tagname = subtag.tag[0].upper() + subtag.tag[1:]
-            try:
-                tagclass = getattr(models, tagname)
-            except AttributeError:
-                warnings.warn('{0} is not implemented'.format(tagname))
-                continue
-            element = tagclass(subtag)
-            self.append(element)
-            if hasattr(element, "id"):
-                self.objects[element.id] = element
-        for element in self.objects.values():
+        for element in self.children.values():
             if hasattr(element, 'process_refs'):
-                element.process_refs(self.objects)
+                element.process_refs(self.children)
         self.instances = []
         
     def element_count(self):
@@ -59,7 +47,7 @@ class ProcessInst(Thread):
         super(ProcessInst, self).__init__()
         self.process = process
         self.state = "none"
-        self.tokens = set([e for e in process.objects.values() if e.auto_instantiate])
+        self.tokens = set([e for e in process.children.values() if e.auto_instantiate])
         self.is_running = False
         self.is_finished = False
 

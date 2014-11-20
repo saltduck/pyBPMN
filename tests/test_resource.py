@@ -3,6 +3,7 @@ from nose.tools import eq_, ok_
 from bpmn import engine
 
 def test_1():
+    engine.db.clear()
     xmlstr = """
 <definitions>
 <resource id="regionalManager" name="Regional Manager">

@@ -52,8 +52,16 @@ class FlowNode(FlowElement):
         return [outgoing.targetRef for outgoing in self.outgoing]
     
 
-class Expression(SequenceFlow):
+class Expression(BaseElement):
     pass
+
+
+class FormalExpression(Expression):
+    def __init__(self, tag, *args, **kwargs):
+        super(FormalExpression, self).__init__(tag, *args, **kwargs)
+        self.language = tag.attrib.get('language')
+        self.body = tag.text
+        self.set_association('evaluatesTypeRef', ItemDefinition, single=True)
 
 
 class FlowElementsContainer(BaseElement):
@@ -81,10 +89,7 @@ class Resource(RootElement):
     def __init__(self, tag):
         super(Resource, self).__init__(tag)
         self.name = tag.attrib["name"]
-        self.resourceParameters = []
-        for subtag in tag.getchildren():
-            if subtag.tag == 'resourceParameter':
-                self.resourceParameters.append(ResourceParameter(subtag))
+        self.setassociation('resourceParameters', ResourceParameter)
 
 
 class ResourceParameter(BaseElement):

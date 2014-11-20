@@ -17,6 +17,9 @@ class DataStore(object):
     def count(self):
         return len(self.data)
 
+    def clear(self):
+        self.data = {}
+
     def get_event(self, eid):
         from .event import Event
         for elem in self.data.values():
