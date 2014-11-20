@@ -1,15 +1,15 @@
 from gettext import gettext as _
 
 from bpmn.exceptions import XMLFormatError
-from .common import FlowNode
+from bpmn.core import StringAttribute, BooleanAttribute, IntAttribute, SingleAssociation, MultiAssociation
+from .foundation import BaseElement
+from .common import FlowNode, Expression, Resource, ResourceParameter
 
 
 class Activity(FlowNode):
-    def __init__(self, tag):
-        super(Activity,self).__init__(tag)
-        self.isForCompensation = tag.attrib.get("isForCompensation", False)
-        self.startQuantity = tag.attrib.get("startQuantity", 1)
-        self.completionQuantity = tag.attrib.get("completionQuantity", 1)
+    isForCompensation = BooleanAttribute('isForCompensation', default=False)
+    startQuantity = IntAttribute('startQuantity', default=1)
+    completionQuantity = IntAttribute('completionQuantity', default=1)
 
     @property
     def auto_instantiate(self):
@@ -49,11 +49,11 @@ class Task(Activity):
 
 class ScriptTask(Task):
     SCRIPTFORMAT = "application/x-pybpmn"
+    script = StringAttribute('script')
+    scriptFormat = StringAttribute('scriptFormat')
     
-    def __init__(self, tag):
-        super(ScriptTask,self).__init__(tag)
-        self.script = tag.attrib.get("script")
-        self.scriptFormat = tag.attrib.get("scriptFormat")
+    def validate(self):
+        super(ScriptTask,self).validate()
         if self.script:
             if not self.scriptFormat:
                 raise XMLFormatError(_("ScriptTask must have scriptFormat attribute if script attribute exists."))
@@ -69,6 +69,26 @@ class ScriptTask(Task):
 
 
 class ServiceTask(Task):
-    def __init__(self, tag):
-        super(ServiceTask,self).__init__(tag)
-        self.implementation = tag.attrib.get("implementation", "##WebService")
+    implementation = StringAttribute('implementation', default='##WebService')
+
+
+class ResourceAssignmentExpression(BaseElement):
+    expression = SingleAssociation(Expression, required=True)
+
+
+class ResourceParameterBinding(BaseElement):
+    parameterRef = SingleAssociation(ResourceParameter, required=True)
+    expression = SingleAssociation(Expression, required=True)
+
+
+class ResourceRole(BaseElement):
+    name = StringAttribute('name')
+    resourceRef = SingleAssociation(Resource)
+    resourceAssignmentExpression = SingleAssociation(ResourceAssignmentExpression)
+    resourceParameterBindings = MultiAssociation(ResourceParameterBinding)
+
+    def validate(self):
+        if self.resourceRef and self.resourceAssignmentExpression:
+            raise XMLFormatError('resourceRef and resourceAssignmentExpression should not exists together.')
+        if self.resourceParameterBindings and not self.resourceRef:
+            raise XMLFormatError('resourceParameterBindings is only applicable if a resourceRef is specified.')

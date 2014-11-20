@@ -1,13 +1,5 @@
 import warnings
-
-
-class MetaRegister(type):
-    registry = {}
-
-    def __new__(cls, name, bases, attrs):
-        new_cls = super(MetaRegister, cls).__new__(cls, name, bases, attrs)
-        cls.registry[name] = new_cls
-        return new_cls
+from .core import MetaRegister
 
 def analyze_node(node):
     tagname = node.tag[0].upper() + node.tag[1:]

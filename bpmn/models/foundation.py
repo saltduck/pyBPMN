@@ -1,19 +1,23 @@
+import logging
+logger = logging.getLogger(__file__)
 import uuid
 import warnings
 
 from bpmn import engine
 from bpmn.exceptions import XMLFormatError
-from bpmn.utils import MetaRegister, analyze_node
+from bpmn.core import MetaRegister, StringAttribute, MultiAssociation
+from bpmn.utils import analyze_node
 
 
 class BaseElement(object):
     __metaclass__ = MetaRegister
+    id = StringAttribute('id', default=lambda : uuid.uuid1().hex)
+    documentation = MultiAssociation('Documentation')
 
     def __init__(self, tag):
         super(BaseElement, self).__init__()
+        self.tag = tag
         self.tagname = tag.tag
-        self.id = tag.attrib.get("id", uuid.uuid1().hex)
-        engine.db[self.id] = self
         self.children = {}
         for subtag in tag.getchildren():
             element = analyze_node(subtag)
@@ -22,27 +26,20 @@ class BaseElement(object):
             if self.children.has_key(element.id):
                 raise XMLFormatError('Duplicate ID!')
             self.children[element.id] = element
-        self.setassociation('documentation', Documentation)
+        for attrname, attr in self.attributes.items():
+            setattr(self, attrname, attr.getvalue(self))
+        engine.db[self.id] = self
+        self.validate()
+        del self.tag    # Just used for attr.getvalue()
 
-    def setassociation(self, attribute, klass, single=False):
-        values = [e for e in self.children.values() if isinstance(e, klass)]
-        if single:
-            if len(values) > 1:
-                raise XMLFormatError('There should be only 1 association to {0} in {1}(id={2})'.format(attribute, self.tagname, self.id))
-            if len(values) == 0:
-                values = None
-            else:   # len(values) == 1
-                values = values[0]
-        setattr(self, attribute, values)
+    def validate(self):
+        pass
 
 
 class RootElement(BaseElement):
-    def __init__(self, tag):
-        super(RootElement, self).__init__(tag)
+    pass
 
 
 class Documentation(BaseElement):
-    def __init__(self, tag):
-        super(Documentation, self).__init__(tag)
-        self.text = tag.attrib.get["text"]
-        self.textFormat = tag.attrib.get["textFormat"]
+    text = StringAttribute('text', required=True)
+    textFormat = StringAttribute('textFormat', required=True)

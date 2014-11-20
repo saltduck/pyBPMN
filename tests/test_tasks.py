@@ -27,7 +27,7 @@ def test_usertask():
     """
     engine.load_definition(xmlstr)
     print engine.db.data
-    eq_(engine.db.count(), 7)
+    eq_(engine.db.count(), 10)
     usertask = engine.db['ApproveOrder']
     eq_(usertask.name, 'ApproveOrder')
     eq_(len(usertask.resources), 1)

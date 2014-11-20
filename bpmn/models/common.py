@@ -1,32 +1,22 @@
 import logging
 logger = logging.getLogger(__file__)
 from bpmn import engine
+from bpmn.core import XMLTagText, StringAttribute, BooleanAttribute, SingleAssociation, MultiAssociation
 from .foundation import BaseElement, RootElement
-
-def make_bool(boolstr):
-    boolstr = boolstr.lower()
-    if boolstr in ('true', 'yes'):
-        return True
-    return False
 
 
 class FlowElement(BaseElement):
     auto_instantiate = False
-
-    def __init__(self, tag):
-        super(FlowElement, self).__init__(tag)
-        self.name = tag.attrib.get("name", "")
+    name = StringAttribute('name', default='')
 
     def instantiate(self):
         return self
 
 
 class SequenceFlow(FlowElement):
-    def __init__(self, tag):
-        super(SequenceFlow, self).__init__(tag)
-        self.source_id = tag.attrib["sourceRef"]
-        self.target_id = tag.attrib["targetRef"]
-        self.isImmediate = tag.attrib.get("isImmediate", False)
+    source_id = StringAttribute('sourceRef', required=True)
+    target_id = StringAttribute('targetRef', required=True)
+    isImmediate = BooleanAttribute('isImmediate', default=False)
 
     def process_refs(self, objects):
         self.sourceRef = objects[self.source_id]
@@ -57,11 +47,9 @@ class Expression(BaseElement):
 
 
 class FormalExpression(Expression):
-    def __init__(self, tag, *args, **kwargs):
-        super(FormalExpression, self).__init__(tag, *args, **kwargs)
-        self.language = tag.attrib.get('language')
-        self.body = tag.text
-        self.set_association('evaluatesTypeRef', ItemDefinition, single=True)
+    language = StringAttribute('language')
+    evaluatesTypeRef = SingleAssociation('ItemDefinition')
+    body = XMLTagText()
 
 
 class FlowElementsContainer(BaseElement):
@@ -80,26 +68,18 @@ class ItemDefinition(RootElement):
 
 
 class Message(RootElement):
-    def __init__(self, tag):
-        super(Message, self).__init__(tag)
-        self.name = tag.attrib["name"]
-
-
-class Resource(RootElement):
-    def __init__(self, tag):
-        super(Resource, self).__init__(tag)
-        self.name = tag.attrib["name"]
-        self.setassociation('resourceParameters', ResourceParameter)
+    name = StringAttribute('name', required=True)
 
 
 class ResourceParameter(BaseElement):
-    def __init__(self, tag):
-        super(ResourceParameter, self).__init__(tag)
-        self.name = tag.attrib["name"]
-        self.isRequired = make_bool(tag.attrib["isRequired"])
+    name = StringAttribute('name', required=True)
+    isRequired = BooleanAttribute('isRequired', required=True)
+
+
+class Resource(RootElement):
+    name = StringAttribute('name', required=True)
+    resourceParameters = MultiAssociation(ResourceParameter)
         
 
 class CallableElement(RootElement):
-    def __init__(self, tag):
-        super(CallableElement, self).__init__(tag)
-        self.name = tag.attrib["name"]
+    name = StringAttribute('name', required=True)

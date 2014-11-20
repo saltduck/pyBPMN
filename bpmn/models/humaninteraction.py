@@ -1,10 +1,15 @@
+from ..core import StringAttribute
 from .activities import Task
+from .process import Performer
 
 
 class UserTask(Task):
-    def __init__(self, tag):
-        super(UserTask,self).__init__(tag)
-        self.implementation = tag.attrib.get("implementation", "##unspecified")
+    implementation = StringAttribute('implementation', '##unspecified')
 
 
-class PotentialOwner():pass
+class HumanPerformer(Performer):
+    pass
+
+
+class PotentialOwner(HumanPerformer):
+    pass

@@ -9,16 +9,18 @@ import copy
 import warnings
 from threading import Thread
 
+from ..core import StringAttribute, BooleanAttribute
 from .common import FlowElementsContainer, CallableElement
+from .activities import ResourceRole
 
  
 class Process(FlowElementsContainer, CallableElement):
+    processType = StringAttribute('processType', 'none')
+    isClosed = BooleanAttribute('isClosed', False)
+    isExecutable = BooleanAttribute('isExecutable', True)
     """ Process Class """
     def __init__(self, root):
         super(Process, self).__init__(root)
-        self.processType = root.get("processType", "none")
-        self.isClosed = root.get("isClosed", False)
-        self.isExecutable = root.get("isExecutable", True)
         for element in self.children.values():
             if hasattr(element, 'process_refs'):
                 element.process_refs(self.children)
@@ -71,3 +73,7 @@ class ProcessInst(Thread):
         
     def alive(self):
         return self.is_running
+
+
+class Performer(ResourceRole):
+    pass
