@@ -20,6 +20,14 @@ class StringAttribute(BaseAttribute):
         super(StringAttribute, self).__init__(xmlattr, default, required)
 
 
+class UriAttribute(StringAttribute):
+    def getvalue(self, element):
+        value = super(UriAttribute, self).getvalue(element)
+        if value and not isuri(value):
+            raise XMLFormatError('{0} must be a valid URI'.format(self.xmlstr))
+        return value
+
+
 class BooleanAttribute(BaseAttribute):
     def __init__(self, xmlattr, default=False, required=False):
         super(BooleanAttribute, self).__init__(xmlattr, default, required)

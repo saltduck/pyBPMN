@@ -33,6 +33,7 @@ db = DataStore()
 processes = {}
 
 def _analyze_tree(root):
+    from . import models
     eq_(root.tag, 'definitions')
     for tag in root.getchildren():
         element = analyze_node(tag)

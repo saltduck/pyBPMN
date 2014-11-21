@@ -26,6 +26,9 @@ class SequenceFlow(FlowElement):
         self.targetRef.incoming.append(self)
         self.sourceRef.outgoing.append(self)
 
+    def condition_ok(self):
+        return False
+
 
 class FlowNode(FlowElement):
     def __init__(self, tag):
