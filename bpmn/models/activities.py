@@ -1,6 +1,6 @@
 from gettext import gettext as _
 
-from .. import engine
+from bpmn import engine
 from bpmn.exceptions import XMLFormatError
 from bpmn.core import StringAttribute, BooleanAttribute, IntAttribute, SingleAssociation, MultiAssociation
 from .foundation import BaseElement

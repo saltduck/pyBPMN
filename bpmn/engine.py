@@ -30,17 +30,16 @@ class DataStore(object):
         raise KeyError
 db = DataStore()
 
+definitions = []
 processes = {}
 
 def _analyze_tree(root):
-    from . import models
-    eq_(root.tag, 'definitions')
-    for tag in root.getchildren():
-        element = analyze_node(tag)
-        if element is None:
-            continue
-        if tag.tag == 'process':
-            processes[element.id] = element
+    from models.infrastructure import Definitions
+    d = Definitions(root)
+    definitions.append(d)
+    for cid, child in d.children.items():
+        if child.tagname == 'process':
+            processes[cid] = child
 
 def load_definition(xmlstr):
     root = ElementTree.fromstring(xmlstr)

@@ -8,6 +8,4 @@ def test_sample1():
     proc = engine.processes['BuyerProcess']
     assert proc.children
     inst = proc.instantiate()
-    eq_(len(inst.tokens), 1)
     proc.join()
-    assert len(proc.instances)==0

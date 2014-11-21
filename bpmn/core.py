@@ -22,6 +22,9 @@ class StringAttribute(BaseAttribute):
 
 class UriAttribute(StringAttribute):
     def getvalue(self, element):
+        def isuri(value):
+            # TODO
+            return True
         value = super(UriAttribute, self).getvalue(element)
         if value and not isuri(value):
             raise XMLFormatError('{0} must be a valid URI'.format(self.xmlstr))

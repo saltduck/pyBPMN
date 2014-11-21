@@ -8,7 +8,7 @@ from bpmn.models.humaninteraction import PotentialOwner
 def test_usertask():
     engine.db.clear()
     xmlstr = """
-<definitions>
+<definitions targetNamespace="http://www.example.org/UserTaskExample">
 <resource id="regionalManager" name="Regional Manager">
 <resourceParameter id="buyerName" isRequired="true" name="Buyer Name" type="xsd:string"/>
 <resourceParameter id="region" isRequired="false" name="Region" type="xsd:string"/>
@@ -27,7 +27,7 @@ def test_usertask():
 </definitions>
     """
     engine.load_definition(xmlstr)
-    eq_(engine.db.count(), 10)
+    eq_(engine.db.count(), 11)
     usertask = engine.db['ApproveOrder']
     eq_(usertask.name, 'ApproveOrder')
     eq_(len(usertask.resources), 1)

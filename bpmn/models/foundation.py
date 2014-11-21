@@ -5,17 +5,15 @@ import warnings
 
 from bpmn import engine
 from bpmn.exceptions import XMLFormatError
-from bpmn.core import MetaRegister, StringAttribute, MultiAssociation, XMLTagText
+from bpmn.core import MetaRegister, StringAttribute, BooleanAttribute, MultiAssociation, XMLTagText
 from bpmn.utils import analyze_node
 
 
-class BaseElement(object):
+class XMLBaseElement(object):
     __metaclass__ = MetaRegister
-    id = StringAttribute('id', default=lambda : uuid.uuid1().hex)
-    documentation = MultiAssociation('Documentation')
 
     def __init__(self, tag):
-        super(BaseElement, self).__init__()
+        super(XMLBaseElement, self).__init__()
         self.tag = tag
         self.tagname = tag.tag
         self.children = {}
@@ -36,6 +34,11 @@ class BaseElement(object):
         pass
 
 
+class BaseElement(XMLBaseElement):
+    id = StringAttribute('id', default=lambda : uuid.uuid1().hex)
+    documentation = MultiAssociation('Documentation')
+
+
 class RootElement(BaseElement):
     pass
         
@@ -47,3 +50,24 @@ class ReferenceElement(BaseElement):
 class Documentation(BaseElement):
     text = StringAttribute('text', required=True)
     textFormat = StringAttribute('textFormat', required=True)
+
+
+class Relationship(BaseElement):
+    type = StringAttribute('type', required=True)
+    direction = StringAttribute('direction')
+    source = MultiAssociation('Source', required=True)
+    target = MultiAssociation('Target', required=True)
+
+
+class Source(XMLBaseElement):
+    ref = StringAttribute('ref', required=True)
+
+
+class Target(XMLBaseElement):
+    ref = StringAttribute('ref', required=True)
+
+
+class Extension(XMLBaseElement):
+    definition = StringAttribute('definition')
+    mustUnderstand = BooleanAttribute('mustUnderstand', False)
+    documentation = MultiAssociation('Documentation')

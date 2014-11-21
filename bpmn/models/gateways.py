@@ -1,4 +1,4 @@
-from .. import engine
+from bpmn import engine
 from ..core import StringAttribute
 from .common import FlowNode
 

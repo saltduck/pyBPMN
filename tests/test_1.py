@@ -7,7 +7,7 @@ from bpmn import engine
 def test_1():
     engine.db.clear()
     engine.load_definition("""
-<definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
+<definitions targetNamespace="http://www.example.org/UserTaskExample" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
     <process id="p1" name="process1">
         <startEvent id="event_1" name="START"></startEvent>
         <sequenceFlow id="sf1" sourceRef="event_1" targetRef="2"></sequenceFlow>
